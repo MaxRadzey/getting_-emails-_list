@@ -20,20 +20,16 @@
         </tr>
     </thead>
     <tbody>
-        {% comment %} {% for message in messages %}
+        {% for message in messages %}
         <tr>
             <td>{{ message.email_from }}</td>
-            <td>{{ message.title }}</td>
+            <td>{{ message.title|slice:":50"  }}</td>
             <td>{{ message.dispatch_date }}</td>
             <td>{{ message.receipt_date }}</td>
-            <td>{{ message.text }}</td>
+            <td>{{ message.text|slice:":50" }}</td>
             <td>{{ message.files }}</td>
         </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">Писем нет.</td>
-        </tr>
-        {% endfor %} {% endcomment %}
+        {% endfor %}
     </tbody>
 </table>
 

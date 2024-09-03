@@ -12,7 +12,6 @@ urlpatterns = [
     ),
     path(
         'get-data/<str:email>/',
-        # views.fetch_messages,
         views.get_emails,
         name='get_data'
     ),

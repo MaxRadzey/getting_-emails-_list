@@ -1,9 +1,11 @@
+from cryptography.fernet import Fernet
 from django.db import models
+from django.conf import settings
 
 from .base import BaseModel
-from .constants import (EMAIL_CHOICES, MAX_PASSWORD_LEGTH, MAX_TITLE_LEGTH,
-                        YANDEX, MAX_EMAIL_LEGTH)
-from .utils import EmailDomenValidator
+from .constants import (EMAIL_CHOICES, MAX_EMAIL_LEGTH, MAX_PASSWORD_LEGTH,
+                        YANDEX)
+from .utils import EmailDomenValidator, mail_directory_path
 
 
 class Email(BaseModel):
@@ -24,6 +26,17 @@ class Email(BaseModel):
         verbose_name = 'Почта'
         verbose_name_plural = 'Почты'
         ordering = ('created_at',)
+
+    def save(self, *args, **kwargs):
+        key = settings.KEY
+        fernet = Fernet(key)
+        self.password = fernet.encrypt(self.password.encode()).decode()
+        super().save(*args, **kwargs)
+
+    def get_password(self):
+        key = settings.KEY
+        fernet = Fernet(key)
+        return fernet.decrypt(self.password.encode()).decode()
 
     def __str__(self) -> str:
         return f'{self.email}'
@@ -69,19 +82,22 @@ class MessageData(BaseModel):
         return f'{self.title}'
 
 
-# class MessageFile(BaseModel):
+class MessageFile(BaseModel):
 
-#     message = models.ForeignKey(
-#         MessageData, on_delete=models.CASCADE,
-#         verbose_name='Прикрепленные файлы',
-#         related_name='email_files',
-#     )
-#     file = models.FileField()
+    message = models.ForeignKey(
+        MessageData, on_delete=models.CASCADE,
+        verbose_name='Прикрепленные файлы',
+        related_name='email_files',
+    )
+    file = models.FileField(
+        "Файл",
+        upload_to=mail_directory_path,
+    )
 
-#     class Meta:
-#         verbose_name = 'Файл'
-#         verbose_name_plural = 'Файлы'
-#         ordering = ('created_at',)
+    class Meta:
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+        ordering = ('created_at',)
 
-#     def __str__(self) -> str:
-#         return f'Автор: {self.message} - {self.created_at}'
+    def __str__(self) -> str:
+        return f'Файлы из пиьсьма {self.message}'

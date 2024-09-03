@@ -137,3 +137,6 @@ dmypy.json
 # Папки со статикой и медиа
 media/
 staticfiles/
+
+# Настройка mypy
+mypy.ini

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Email, MessageData
+from .models import Email, MessageData, MessageFile
 
 
 @admin.register(Email)
@@ -30,3 +30,14 @@ class MessageDataAdmin(admin.ModelAdmin):
     )
     search_fields = ("email",)
     list_filter = ("email",)
+
+
+@admin.register(MessageFile)
+class MessageFileAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "message",
+        "file",
+    )
+    search_fields = ("message",)
+    list_filter = ("message",)

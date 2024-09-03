@@ -7,6 +7,8 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+KEY = os.getenv('EMAIL_PASSWORD_ENCRYPTION_KEY')
+
 SECRET_KEY = os.getenv("SECRET_KEY", "secret-key")
 
 DEBUG = os.getenv("DEBUG_VALUE") == "True"
@@ -108,6 +110,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
