@@ -1,0 +1,10 @@
+{% load static %}
+<header>
+  <nav class="navbar navbar-light" style="background-color: lightskyblue">
+    <div class="container">
+      <a class="nav-link {% if view_name == 'msg:add_mail' %} text-white {% endif %}" href="{% url 'msg:add_mail' %}">
+        Добавить почту
+      </a>
+    </div>
+  </nav>
+</header>

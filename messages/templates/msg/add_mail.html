@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}
+  Добавить почту
+{% endblock %}
+{% block content %}
+  <h1 class="mb-5 text-center ">Добавить почту</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+    <h2 class="mb-5 text-center">Список почтовых ящиков</h2>
+    <table id="all-emails-table" class="table">
+      <thead>
+          <tr>
+              <th>Почта</th>
+              <th>Действие</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for email_account in email_accounts %}
+          <tr>
+              <td>{{ email_account.email }}</td>
+              <td>
+                <form method="GET" action="{% url 'msg:get_data' email=email_account.email %}">
+                  <button button type="submit" class="btn btn-primary">Получить письма</button>
+              </form>
+              </td>
+          </tr>
+          {% empty %}
+          <tr>
+              <td colspan="4">Ящиков нет.</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

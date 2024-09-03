@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}
+  Данные из почты
+{% endblock %}
+{% block content %}
+  <h1 class="mb-5 text-center ">Почта: {{ mail_to }}</h1>
+  <h1 class="mb-5 text-center ">Список писем</h1>
+  <div class="progress">
+    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+  <table id="emails-table" class="table">
+    <thead>
+        <tr>
+            <th>Отправитель</th>
+            <th>Тема сообщения</th>
+            <th>Дата отправки</th>
+            <th>Дата получения</th>
+            <th>Текст сообщения</th>
+            <th>Прикрепленные файлы</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% comment %} {% for message in messages %}
+        <tr>
+            <td>{{ message.email_from }}</td>
+            <td>{{ message.title }}</td>
+            <td>{{ message.dispatch_date }}</td>
+            <td>{{ message.receipt_date }}</td>
+            <td>{{ message.text }}</td>
+            <td>{{ message.files }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Писем нет.</td>
+        </tr>
+        {% endfor %} {% endcomment %}
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    // Подключаемся к WebSocket
+    const websocket = new WebSocket('ws://' + window.location.host + '/ws/msg/');
+
+    // Обработчик событий при получении сообщения через WebSocket
+    websocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'email') {
+            addEmailToTable(data.email_data);
+        } else if (data.type === 'progress') {
+            updateProgressBar(data.progress);
+        }
+    };
+
+    websocket.onerror = function(event) {
+        console.error("WebSocket ошибка:", event);
+    };
+
+    websocket.onclose = function(event) {
+        console.warn("WebSocket соединение закрыто :(");
+    };
+
+    function addEmailToTable(msg) {
+        const table = document.getElementById('emails-table').getElementsByTagName('tbody')[0];
+        const row = table.insertRow();
+
+        const email_fromCell = row.insertCell(0);
+        const titleCell = row.insertCell(1);
+        const dispatch_dateCell = row.insertCell(2);
+        const receipt_dateCell = row.insertCell(3);
+        const textCell = row.insertCell(4);
+        const filesCell = row.insertCell(5);
+    
+        email_fromCell.textContent = msg.email_from;
+        titleCell.textContent = msg.title;
+        dispatch_dateCell.textContent = msg.dispatch_date;
+        receipt_dateCell.textContent = msg.receipt_date;
+        textCell.textContent = msg.text;
+
+        if (msg.files) {
+            const filenames = msg.files.map(att => att.filename).join(", ");
+            filesCell.textContent = filenames;
+        }
+    }
+
+    function updateProgressBar(progress) {
+            const progressBar = document.getElementById('progress-bar');
+            const percentage = (progress.count / progress.total_messages) * 100;
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = `${progress.count} из ${progress.total_messages}`;
+        }
+</script>
+
+{% endblock %}
